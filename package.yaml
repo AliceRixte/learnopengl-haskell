@@ -43,7 +43,7 @@ library:
 executables:
   hellowindow:
     main:                Main.hs
-    source-dirs:         hellowindow
+    source-dirs:         app/hellowindow
     ghc-options:
     - -threaded
     - -rtsopts
