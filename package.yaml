@@ -52,7 +52,7 @@ executables:
     - learnopengl-haskell
   hellotriangle:
     main:                Main.hs
-    source-dirs:         hellotriangle
+    source-dirs:         app/hellotriangle
     ghc-options:
     - -threaded
     - -rtsopts

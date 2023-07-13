@@ -38,9 +38,12 @@ main = do
   window <-
     SDL.createWindow
       "Learn OpenGL"
-      SDL.defaultWindow {SDL.windowInitialSize = V2 screenWidth screenHeight,
-                         SDL.windowGraphicsContext = 
-                                            SDL.OpenGLContext core33Config}
+      SDL.defaultWindow {  
+            SDL.windowInitialSize = V2 screenWidth screenHeight
+          , SDL.windowGraphicsContext = SDL.OpenGLContext core33Config
+          , SDL.windowResizable = True
+          }
+          
   SDL.showWindow window
 
   _ <- SDL.glCreateContext window
