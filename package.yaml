@@ -41,7 +41,7 @@ library:
   source-dirs: src
 
 executables:
-  hellowindow-exe:
+  hellowindow:
     main:                Main.hs
     source-dirs:         hellowindow
     ghc-options:
@@ -50,6 +50,16 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
+  hellotriangle:
+    main:                Main.hs
+    source-dirs:         hellotriangle
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
+
 
 tests:
   learnopengl-haskell-test:
