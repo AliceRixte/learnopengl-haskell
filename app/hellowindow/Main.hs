@@ -52,6 +52,7 @@ main = do
         events <- SDL.pollEvents
         let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
 
+        GL.clearColor $= GL.Color4 0.2 0.3 0.3 1.0
         GL.clear [GL.ColorBuffer]
         SDL.glSwapWindow window
 

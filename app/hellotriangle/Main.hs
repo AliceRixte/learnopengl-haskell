@@ -45,14 +45,14 @@ main = do
   SDL.showWindow window
 
   _ <- SDL.glCreateContext window
-  -- (prog, attrib) <- initResources
+  (prog, attrib) <- initResources
 
   let loop = do
         events <- SDL.pollEvents
         let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
 
         GL.clear [GL.ColorBuffer]
-        -- draw prog attrib
+        draw prog attrib
         SDL.glSwapWindow window
 
         unless quit loop
