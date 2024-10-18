@@ -25,6 +25,7 @@ dependencies:
 - sdl2
 - vector
 - bytestring
+- linear
 
 ghc-options:
 - -Wall
