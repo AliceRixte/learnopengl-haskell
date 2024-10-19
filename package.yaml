@@ -47,7 +47,7 @@ library:
 executables:
   hellowindow:
     main:                Main.hs
-    source-dirs:         app/hellowindow
+    source-dirs:         app/1-hellowindow
     ghc-options:
     - -threaded
     - -rtsopts
@@ -56,16 +56,16 @@ executables:
     - learnopengl-haskell
   hellotriangle:
     main:                Main.hs
-    source-dirs:         app/hellotriangle
+    source-dirs:         app/2-hellotriangle
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
-  simpletriangle:
-    main:                Main.hs
-    source-dirs:         app/simpletriangle
+  simplertriangle:
+    main:                simplertriangle.hs
+    source-dirs:         app/2-hellotriangle
     ghc-options:
     - -threaded
     - -rtsopts
