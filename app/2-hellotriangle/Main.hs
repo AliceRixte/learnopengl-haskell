@@ -10,6 +10,7 @@ import qualified Data.ByteString as BS
 import qualified Data.Vector.Storable as V
 import Foreign.Storable (sizeOf)
 import Foreign.Ptr (nullPtr)
+import Foreign.C.Types
 
 import qualified SDL
 import Graphics.Rendering.OpenGL
@@ -48,10 +49,14 @@ vertices = V.fromList [ -0.5, -0.5, 0.0
             ,  0.0,  0.5, 0.0
             ]
 
+screenWidth, screenHeight :: CInt
+(screenWidth, screenHeight) = (800,600)
 
 main :: IO ()
 main = do
-  window <- openWindow
+  window <- openWindow screenWidth screenHeight
+  viewport $= (Position 0 0, Size (fromIntegral screenWidth) (fromIntegral screenHeight))
+
   -------------------------- Compile and link shaders --------------------------
 
   -- vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -130,7 +135,7 @@ main = do
         clear [ColorBuffer]
         -- glClear(GL_COLOR_BUFFER_BIT);
 
-        -- viewport $= (Position 0 0, Size (fromIntegral screenWidth) (fromIntegral screenHeight))
+
 
         currentProgram $= Just program
         -- glUseProgram(shaderProgram);

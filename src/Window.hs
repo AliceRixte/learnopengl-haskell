@@ -9,10 +9,6 @@ import SDL (($=))
 import qualified SDL
 import SDL.Vect
 
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
-
-
 -- core33Config :: SDL.OpenGLConfig
 -- core33Config = SDL.OpenGLConfig
 --   { SDL.glColorPrecision = V4 8 8 8 0
@@ -23,8 +19,8 @@ screenWidth, screenHeight :: CInt
 --   }
 
 -- | Create a new SDL/OpenGL window
-openWindow :: IO (SDL.Window)
-openWindow = do
+openWindow :: CInt -> CInt -> IO (SDL.Window)
+openWindow screenWidth screenHeight = do
   SDL.initialize [SDL.InitVideo]
   SDL.HintRenderScaleQuality $= SDL.ScaleLinear
 
