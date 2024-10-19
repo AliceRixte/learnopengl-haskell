@@ -1,7 +1,6 @@
---port of https://github.com/bergey/haskell-OpenGL-examples
-
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Main (main) where
 
 import Control.Monad

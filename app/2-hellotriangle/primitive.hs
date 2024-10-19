@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 import SDL
 import qualified Graphics.Rendering.OpenGL as GL
 import Foreign.C.Types

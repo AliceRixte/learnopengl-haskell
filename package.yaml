@@ -64,7 +64,16 @@ executables:
     dependencies:
     - learnopengl-haskell
   simplertriangle:
-    main:                simplertriangle.hs
+    main:                simpler.hs
+    source-dirs:         app/2-hellotriangle
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
+  blub:
+    main:                blub.hs
     source-dirs:         app/2-hellotriangle
     ghc-options:
     - -threaded
