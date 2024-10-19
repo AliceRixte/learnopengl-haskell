@@ -5,8 +5,7 @@
 module Main(main) where
 
 import Control.Monad
-import Foreign.C.Types
-import SDL.Vect
+
 import qualified Data.ByteString as BS
 import qualified Data.Vector.Storable as V
 import           System.Exit (exitFailure)
@@ -16,35 +15,18 @@ import SDL (($=))
 import qualified SDL
 import qualified Graphics.Rendering.OpenGL as GL
 
-import Util
-
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
+import Window
 
 vertices :: V.Vector Float
-vertices = V.fromList [  -0.5,  0.5, 0.0
-                      , 0.5, -0.5, 0.0
-                      ,  0.0 , 0.5, 0.0
+vertices = V.fromList [ -0.5,  0.5, 0.0
+                      ,  0.5, -0.5, 0.0
+                      ,  0.0,  0.5, 0.0
                       ]
 
 main :: IO ()
 main = do
-  SDL.initialize [SDL.InitVideo]
-  SDL.HintRenderScaleQuality $= SDL.ScaleLinear
 
-  do renderQuality <- SDL.get SDL.HintRenderScaleQuality
-     when (renderQuality /= SDL.ScaleLinear) $
-       putStrLn "Warning: Linear texture filtering not enabled!"
-
-  window <-
-    SDL.createWindow
-      "SDL / OpenGL Example"
-      SDL.defaultWindow {SDL.windowInitialSize = V2 screenWidth screenHeight,
-                         SDL.windowGraphicsContext = SDL.OpenGLContext SDL.defaultOpenGL}
-  SDL.showWindow window
-
-  _ <- SDL.glCreateContext window
+  window <- openWindow
   (prog, attrib) <- initResources
 
   let loop = do
@@ -59,9 +41,7 @@ main = do
 
   loop
 
-  SDL.destroyWindow window
-  SDL.quit
-
+  closeWindow window
 
 initResources :: IO (GL.Program, GL.AttribLocation)
 initResources = do

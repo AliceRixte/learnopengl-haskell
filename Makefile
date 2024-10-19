@@ -1,6 +1,6 @@
 # The following variables can be set in command line. For instance : "make run
 # exe=myExe"
-pkg = stack-template
+pkg = learnopengl-haskell
 trg = lib
 exe = $(pkg)-exe
 tst = $(pkg)-test

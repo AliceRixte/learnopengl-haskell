@@ -17,15 +17,6 @@ import qualified Graphics.Rendering.OpenGL as GL
 screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (640, 480)
 
-core33Config :: SDL.OpenGLConfig
-core33Config = SDL.OpenGLConfig
-  { SDL.glColorPrecision = V4 8 8 8 0
-  , SDL.glDepthPrecision = 24
-  , SDL.glStencilPrecision = 8
-  , SDL.glMultisampleSamples = 1
-  , SDL.glProfile = SDL.Core SDL.Debug 3 3 
-  }
-
 main :: IO ()
 main = do
   SDL.initialize [SDL.InitVideo]
@@ -38,12 +29,12 @@ main = do
   window <-
     SDL.createWindow
       "Learn OpenGL"
-      SDL.defaultWindow {  
+      SDL.defaultWindow {
             SDL.windowInitialSize = V2 screenWidth screenHeight
-          , SDL.windowGraphicsContext = SDL.OpenGLContext core33Config
+          , SDL.windowGraphicsContext = SDL.OpenGLContext SDL.defaultOpenGL
           , SDL.windowResizable = True
           }
-          
+
   SDL.showWindow window
 
   _ <- SDL.glCreateContext window

@@ -5,7 +5,8 @@
 
 -- | Fast(ish) rendering of circles.
 module Circle
-        ( renderCircle
+        ( module Circle
+        , renderCircle
         , renderArc)
 where
 -- import  Graphics.Gloss.Internals.Rendering.Common
