@@ -68,7 +68,7 @@ ghci:
 	$(stack) ghci $(pkg):$(trg)
 
 ghci-exe:
-	$(stack) ghci $(pkg):$(trg) --test --main-is $(pkg):$(exe)
+	$(stack) ghci $(pkg):lib --test --main-is $(pkg):$(exe)
 
 ghci-test:
 	$(stack) ghci $(pkg):test:$(tst)
@@ -82,7 +82,7 @@ ide:
 	ghcid --command="stack ghci"
 
 ide-exe:
-	$(stack) exec -- ghcid -c "stack ghci $(pkg):$(trg) --test --main-is $(pkg):$(exe)"
+	ghcid -c "$(stack) ghci $(pkg):lib --test --main-is $(pkg):$(exe)"
 
 
 ide-test:

@@ -14,18 +14,14 @@ import Foreign.Marshal.Alloc
 import GHC.Word
 
 import System.Exit
-import System.IO
 
 import qualified SDL
 import Graphics.GL
 
 compileShader :: GLenum -> FilePath -> IO Word32
 compileShader shaderType shaderSource = do
-  putStrLn "zauhz"
-  hFlush stdout
   shader <- glCreateShader shaderType
   blub <- readFile shaderSource
-  putStrLn blub
   shaderSourceC <- newCString =<< readFile shaderSource
   alloca $ \ shaderSourcePtr -> do
     shaderSourcePtr `poke` shaderSourceC
@@ -40,7 +36,6 @@ compileShader shaderType shaderSource = do
       when (success <= 0) $ do
         putStrLn "Failed to compile shader "
         exitFailure
-      putStrLn "Compiled shader successfully"
   return shader
 
 compileVertexShader :: FilePath -> IO Word32
