@@ -22,6 +22,7 @@ description:         Please see the README on GitHub at <https://github.com/Auto
 dependencies:
 - base >= 4.7 && < 5
 - OpenGL
+- gl
 - sdl2
 - vector
 - bytestring
@@ -45,9 +46,18 @@ library:
   source-dirs: src
 
 executables:
-  hellowindow:
+  hello-window:
     main:                Main.hs
-    source-dirs:         app/1-hellowindow
+    source-dirs:         app/1-hello-window
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
+  hello-window-gl:
+    main:                Main.hs
+    source-dirs:         app/1-hello-window-gl
     ghc-options:
     - -threaded
     - -rtsopts

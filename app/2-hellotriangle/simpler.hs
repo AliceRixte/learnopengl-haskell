@@ -20,8 +20,12 @@ import System.Exit ( exitWith, ExitCode(..) )
 import Foreign.Marshal.Array
 import Foreign.Ptr
 import Foreign.Storable
+import Foreign.C.Types
 
 import Window
+
+screenWidth, screenHeight :: CInt
+(screenWidth, screenHeight) = (640, 480)
 
 vertices :: V.Vector Float
 vertices = V.fromList [ -0.5,  0.5, 0.0
@@ -32,7 +36,7 @@ vertices = V.fromList [ -0.5,  0.5, 0.0
 main :: IO ()
 main = do
 
-  window <- openWindow
+  window <- openWindow screenWidth screenHeight
   (prog, attrib) <- compileShaders
   descr <- initResources
   let loop = do
