@@ -28,6 +28,10 @@ dependencies:
 - bytestring
 - linear
 
+when:
+  - condition: os(windows)
+    ghc-options: -optl-mconsole
+
 ghc-options:
 - -Wall
 - -Wcompat
@@ -44,6 +48,7 @@ default-extensions:
 
 library:
   source-dirs: src
+
 
 executables:
   hello-window:
@@ -68,6 +73,8 @@ executables:
     main:                Main.hs
     source-dirs:         app/1-Getting-started/2-hello-triangle/opengl
     ghc-options:
+    - -optl-mconsole
+    - -optl-mwindows
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
@@ -92,8 +99,8 @@ executables:
     dependencies:
     - learnopengl-haskell
   hello-triangle-gl:
-    main:                Main.hs
-    source-dirs:         app/1-Getting-started/2-hello-triangle/gl
+    main:                 Main.hs
+    source-dirs:          app/1-Getting-started/2-hello-triangle/gl
     ghc-options:
     - -threaded
     - -rtsopts

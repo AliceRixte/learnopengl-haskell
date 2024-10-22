@@ -14,13 +14,18 @@ import Foreign.Marshal.Alloc
 import GHC.Word
 
 import System.Exit
+import System.IO
 
 import qualified SDL
 import Graphics.GL
 
 compileShader :: GLenum -> FilePath -> IO Word32
 compileShader shaderType shaderSource = do
+  putStrLn "zauhz"
+  hFlush stdout
   shader <- glCreateShader shaderType
+  blub <- readFile shaderSource
+  putStrLn blub
   shaderSourceC <- newCString =<< readFile shaderSource
   alloca $ \ shaderSourcePtr -> do
     shaderSourcePtr `poke` shaderSourceC
@@ -31,7 +36,7 @@ compileShader shaderType shaderSource = do
       glGetShaderiv shader GL_COMPILE_STATUS successPtr
       success <- peek successPtr
       glGetShaderInfoLog shader 512 nullPtr infoLogPtr
-      mapM_ print =<< lines <$> peekCString infoLogPtr
+      putStrLn =<< peekCString infoLogPtr
       when (success <= 0) $ do
         putStrLn "Failed to compile shader "
         exitFailure
