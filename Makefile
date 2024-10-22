@@ -21,7 +21,8 @@ build:
 	$(stack) build $(pkg):$(trg)
 
 run:
-		$(stack) build --fast $(pkg):exe:$(exe)  && $(stack) exec $(exe)
+		$(stack) build --fast $(pkg):exe:$(exe)
+		$(stack) exec $(exe)
 
 targets:
 	$(stack) ide targets

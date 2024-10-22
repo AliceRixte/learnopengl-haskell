@@ -4,8 +4,8 @@
 {-# OPTIONS_HADDOCK hide #-}
 
 -- | Fast(ish) rendering of circles.
-module Circle
-        ( module Circle
+module LearnGL.Circle
+        ( module LearnGL.Circle
         , renderCircle
         , renderArc)
 where

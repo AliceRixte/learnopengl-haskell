@@ -15,7 +15,7 @@ import Foreign.C.Types
 import qualified SDL
 import Graphics.Rendering.OpenGL
 
-import Window
+import LearnGL.Window
 
 
 -- | This file trie to mirror as closely as possible the following code https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/2.1.hello_triangle/hello_triangle.cpp

@@ -1,5 +1,5 @@
-module Window
-  ( module Window
+module LearnGL.Window
+  ( module LearnGL.Window
   ) where
 
 import Control.Monad

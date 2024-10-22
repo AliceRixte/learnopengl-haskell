@@ -1,8 +1,6 @@
 import SDL
 import qualified Graphics.Rendering.OpenGL as GL
-import Foreign.C.Types
 import Control.Monad (unless)
-import Linear (V2(..), V3(..))
 
 -- Initialize SDL and create an OpenGL context
 initializeSDL :: IO Window

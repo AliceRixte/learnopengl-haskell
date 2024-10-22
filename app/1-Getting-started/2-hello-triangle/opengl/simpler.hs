@@ -18,7 +18,7 @@ import SDL (($=))
 import qualified SDL
 import Graphics.Rendering.OpenGL
 
-import Window
+import LearnGL.Window
 
 screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (640, 480)
