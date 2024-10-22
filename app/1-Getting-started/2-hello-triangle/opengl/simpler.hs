@@ -4,23 +4,19 @@
 module Main(main) where
 
 import Control.Monad
+import System.Exit
+import Foreign.Marshal.Array
+import Foreign.Ptr
+import Foreign.Storable
+import Foreign.C.Types
 
 import qualified Data.ByteString as BS
 import qualified Data.Vector.Storable as V
-import           System.Exit (exitFailure)
 import           System.IO
 
 import SDL (($=))
 import qualified SDL
 import Graphics.Rendering.OpenGL
-
-import Graphics.Rendering.OpenGL as GL
-import Control.Monad
-import System.Exit ( exitWith, ExitCode(..) )
-import Foreign.Marshal.Array
-import Foreign.Ptr
-import Foreign.Storable
-import Foreign.C.Types
 
 import Window
 
