@@ -21,7 +21,6 @@ import Graphics.GL
 compileShader :: GLenum -> FilePath -> IO Word32
 compileShader shaderType shaderSource = do
   shader <- glCreateShader shaderType
-  blub <- readFile shaderSource
   shaderSourceC <- newCString =<< readFile shaderSource
   alloca $ \ shaderSourcePtr -> do
     shaderSourcePtr `poke` shaderSourceC
@@ -43,3 +42,25 @@ compileVertexShader = compileShader GL_VERTEX_SHADER
 
 compileFragmentShader :: FilePath -> IO Word32
 compileFragmentShader = compileShader GL_FRAGMENT_SHADER
+
+makeShaderProgram :: FilePath -> FilePath -> IO Word32
+makeShaderProgram vertexPath fragmentPath = do
+  shaderProgram <- glCreateProgram
+
+  vertexShader <- compileVertexShader vertexPath
+  fragmentShader <- compileFragmentShader fragmentPath
+
+  glAttachShader shaderProgram vertexShader
+  glAttachShader shaderProgram fragmentShader
+  glLinkProgram shaderProgram
+
+  alloca $ \successPtr -> do
+    glGetProgramiv shaderProgram GL_LINK_STATUS successPtr
+    success <- peek successPtr
+    when (success <= 0) $ do
+      alloca $ \infolog -> do
+        glGetShaderInfoLog shaderProgram 512 nullPtr infolog
+        putStrLn "ERROR : Shader program linking failed."
+        putStrLn =<< peekCString infolog
+
+  return shaderProgram
