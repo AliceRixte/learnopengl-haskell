@@ -107,6 +107,15 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
+  square:
+    main:                 square.hs
+    source-dirs:          app/1-Getting-started/2-hello-triangle/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
 
 
 tests:

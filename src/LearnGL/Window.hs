@@ -8,19 +8,22 @@ import Foreign.C.Types
 import SDL (($=))
 import qualified SDL
 import SDL.Vect
+import qualified SDL.Raw as SDLR
 
--- core33Config :: SDL.OpenGLConfig
--- core33Config = SDL.OpenGLConfig
---   { SDL.glColorPrecision = V4 8 8 8 0
---   , SDL.glDepthPrecision = 24
---   , SDL.glStencilPrecision = 8
---   , SDL.glMultisampleSamples = 1
---   , SDL.glProfile = SDL.Core SDL.Debug 3 3
---   }
+core33Config :: SDL.OpenGLConfig
+core33Config = SDL.OpenGLConfig
+  { SDL.glColorPrecision = V4 8 8 8 0
+  , SDL.glDepthPrecision = 24
+  , SDL.glStencilPrecision = 8
+  , SDL.glMultisampleSamples = 1
+  , SDL.glProfile = SDL.Core SDL.Debug 3 3
+  }
 
 -- | Create a new SDL/OpenGL window
 openWindow :: CInt -> CInt -> IO (SDL.Window)
 openWindow screenWidth screenHeight = do
+  SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MAJOR_VERSION 3
+  SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MINOR_VERSION 3
   SDL.initialize [SDL.InitVideo]
   SDL.HintRenderScaleQuality $= SDL.ScaleLinear
 
@@ -32,7 +35,7 @@ openWindow screenWidth screenHeight = do
     SDL.createWindow
       "SDL / OpenGL Example"
       SDL.defaultWindow {SDL.windowInitialSize = V2 screenWidth screenHeight,
-                         SDL.windowGraphicsContext = SDL.OpenGLContext SDL.defaultOpenGL}
+                         SDL.windowGraphicsContext = SDL.OpenGLContext core33Config}
   SDL.showWindow window
   _ <- SDL.glCreateContext window
   return window
