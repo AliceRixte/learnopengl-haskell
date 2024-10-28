@@ -29,6 +29,8 @@ dependencies:
 - linear
 - JuicyPixels
 - JuicyPixels-extra
+- lens
+- pandia-base
 
 when:
   - condition: os(windows)
@@ -130,6 +132,15 @@ executables:
   textures:
     main:                 Main.hs
     source-dirs:          app/1-Getting-started/4-textures/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
+  transformations:
+    main:                 Main.hs
+    source-dirs:          app/1-Getting-started/5-transformations/gl
     ghc-options:
     - -threaded
     - -rtsopts
