@@ -68,12 +68,10 @@ initBuffers = do
           nullPtr
         glEnableVertexAttribArray 0
 
-        alloca $ \locationPtr -> do
-          poke locationPtr ((sizeOf (undefined ::Float) * 3))
-          glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
-            (fromIntegral (sizeOf (undefined :: Float) * 7))
-            (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
-          glEnableVertexAttribArray 1
+        glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
+          (fromIntegral (sizeOf (undefined :: Float) * 7))
+          (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
+        glEnableVertexAttribArray 1
 
         glBindBuffer GL_ARRAY_BUFFER 0
         glBindVertexArray 0

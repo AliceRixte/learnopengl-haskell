@@ -31,6 +31,7 @@ dependencies:
 - JuicyPixels-extra
 - lens
 - pandia-base
+- random
 
 when:
   - condition: os(windows)
@@ -141,6 +142,15 @@ executables:
   transformations:
     main:                 Main.hs
     source-dirs:          app/1-Getting-started/5-transformations/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
+  coordinates:
+    main:                 Main.hs
+    source-dirs:          app/1-Getting-started/6-coordinates/gl
     ghc-options:
     - -threaded
     - -rtsopts

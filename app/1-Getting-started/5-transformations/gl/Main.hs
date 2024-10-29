@@ -127,14 +127,6 @@ initBuffers = do
         glBindVertexArray 0
         return (vao,vbo)
 
-
-g :: M44 Float
-g = mkTransformation angle translationVec
-  where
-    angle = axisAngle (V3 0 0 1.0) (pi / 1)
-    translationVec = V3 0.5 (-0.5) 0.0
-
-
 main :: IO ()
 main = do
   window <- openWindow screenWidth screenHeight
