@@ -42,7 +42,7 @@ screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (800, 600)
 
 thisDir :: FilePath
-thisDir = "app/1-Getting-started/6-coordinates/gl/"
+thisDir = "app/1-Getting-started/10-camera/gl/"
 
 textures :: FilePath
 textures = "textures/"

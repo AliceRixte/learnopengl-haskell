@@ -58,7 +58,7 @@ library:
 executables:
   hello-window:
     main:                Main.hs
-    source-dirs:         app/1-Getting-started/1-hello-window/opengl
+    source-dirs:         app/1-Getting-started/4-hello-window/opengl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -67,7 +67,7 @@ executables:
     - learnopengl-haskell
   hello-window-gl:
     main:                Main.hs
-    source-dirs:         app/1-Getting-started/1-hello-window/gl
+    source-dirs:         app/1-Getting-started/4-hello-window/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -76,7 +76,7 @@ executables:
     - learnopengl-haskell
   hello-triangle:
     main:                Main.hs
-    source-dirs:         app/1-Getting-started/2-hello-triangle/opengl
+    source-dirs:         app/1-Getting-started/5-hello-triangle/opengl
     ghc-options:
     - -optl-mconsole
     - -optl-mwindows
@@ -87,7 +87,7 @@ executables:
     - learnopengl-haskell
   hello-triangle-simpler:
     main:                simpler.hs
-    source-dirs:         app/1-Getting-started/2-hello-triangle/opengl
+    source-dirs:         app/1-Getting-started/5-hello-triangle/opengl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -96,7 +96,7 @@ executables:
     - learnopengl-haskell
   hello-triangle-primitive:
     main:                primitive.hs
-    source-dirs:         app/1-Getting-started/2-hello-triangle/opengl
+    source-dirs:         app/1-Getting-started/5-hello-triangle/opengl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -105,7 +105,7 @@ executables:
     - learnopengl-haskell
   hello-triangle-gl:
     main:                 Main.hs
-    source-dirs:          app/1-Getting-started/2-hello-triangle/gl
+    source-dirs:          app/1-Getting-started/5-hello-triangle/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -114,7 +114,7 @@ executables:
     - learnopengl-haskell
   square:
     main:                 square.hs
-    source-dirs:          app/1-Getting-started/2-hello-triangle/gl
+    source-dirs:          app/1-Getting-started/5-hello-triangle/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -123,7 +123,7 @@ executables:
     - learnopengl-haskell
   shaders:
     main:                 Main.hs
-    source-dirs:          app/1-Getting-started/3-shaders/gl
+    source-dirs:          app/1-Getting-started/6-shaders/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -132,7 +132,7 @@ executables:
     - learnopengl-haskell
   textures:
     main:                 Main.hs
-    source-dirs:          app/1-Getting-started/4-textures/gl
+    source-dirs:          app/1-Getting-started/7-textures/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -141,7 +141,7 @@ executables:
     - learnopengl-haskell
   transformations:
     main:                 Main.hs
-    source-dirs:          app/1-Getting-started/5-transformations/gl
+    source-dirs:          app/1-Getting-started/8-transformations/gl
     ghc-options:
     - -threaded
     - -rtsopts
@@ -150,7 +150,7 @@ executables:
     - learnopengl-haskell
   coordinates:
     main:                 Main.hs
-    source-dirs:          app/1-Getting-started/6-coordinates/gl
+    source-dirs:          app/1-Getting-started/9-coordinates/gl
     ghc-options:
     - -threaded
     - -rtsopts

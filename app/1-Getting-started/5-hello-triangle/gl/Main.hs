@@ -27,7 +27,7 @@ screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
-thisDir = "app/1-Getting-started/2-hello-triangle/gl/"
+thisDir = "app/1-Getting-started/5-hello-triangle/gl/"
 
 vertexPath :: FilePath
 vertexPath = thisDir ++ "shaders/vertex.glsl"

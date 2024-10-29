@@ -21,7 +21,6 @@ import qualified Data.ByteString        as B
 
 import qualified Data.Vector.Storable as V
 
-import Linear
 
 import qualified SDL
 import Graphics.GL
@@ -29,17 +28,19 @@ import Graphics.GL
 import LearnGL.Window
 import LearnGL.Shader
 import LearnGL.Texture
-import LearnGL.Transform
 
-import Pandia.Space.Geometry
-import Pandia.Space.Geometry.Affine3D
+import           Codec.Picture
+import qualified Codec.Picture.Types    as CPTI
+import           Codec.Picture.Extra    (flipVertically)
+import           Codec.Picture.Types
 
+type TEXTURE = Ptr GLuint
 
 screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
-thisDir = "app/1-Getting-started/5-transformations/gl/"
+thisDir = "app/1-Getting-started/7-textures/gl/"
 
 textures :: FilePath
 textures = "textures/"
@@ -58,9 +59,9 @@ fragmentPath = thisDir ++ "shaders/fragment.glsl"
 vertices :: V.Vector GLfloat
 vertices = V.fromList
     [ -0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0
-    ,  0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0
-    ,  0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0
-    , -0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0
+    ,  0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, 0.1, 0.0
+    ,  0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.1, 0.1
+    , -0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.1
     ]
 
 indices :: V.Vector GLuint
@@ -109,19 +110,17 @@ initBuffers = do
 
         glEnableVertexAttribArray 0
 
-        alloca $ \locationPtr -> do
-          poke locationPtr (sizeOf (undefined ::Float) * 3)
-          glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
-            (fromIntegral (sizeOf (undefined :: Float) * 9))
-            (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
-          glEnableVertexAttribArray 1
 
-        alloca $ \locationPtr -> do
-          poke locationPtr (sizeOf (undefined ::Float) * 3)
-          glVertexAttribPointer 2 3 GL_FLOAT GL_FALSE
-            (fromIntegral (sizeOf (undefined :: Float) * 9))
-            (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 7))
-          glEnableVertexAttribArray 2
+        glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
+          (fromIntegral (sizeOf (undefined :: Float) * 9))
+          (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
+        glEnableVertexAttribArray 1
+
+
+        glVertexAttribPointer 2 3 GL_FLOAT GL_FALSE
+          (fromIntegral (sizeOf (undefined :: Float) * 9))
+          (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 7))
+        glEnableVertexAttribArray 2
 
         glBindBuffer GL_ARRAY_BUFFER 0
         glBindVertexArray 0
@@ -138,22 +137,17 @@ main = do
   ourColor <- glGetUniformLocation shaderProgram ourColorStr
 
   glActiveTexture GL_TEXTURE0
-  _ <- loadTexture wall
+  texture0 <- loadTexture wall
   uniTex0 <- glGetUniformLocation shaderProgram =<< newCString "texture0"
 
-  -- texture1 <- loadTexture wall
-
-
-  glActiveTexture GL_TEXTURE1
-  _ <- loadTexture face
+  texture1 <- loadTexture wall
   uniTex1 <- glGetUniformLocation shaderProgram =<< newCString "texture1"
 
-  (vao, _) <- initBuffers
+  glActiveTexture GL_TEXTURE1
+  texture2 <- loadTexture face
 
 
-
-
-
+  (vao, vbo) <- initBuffers
 
   let loop = do
         events <- SDL.pollEvents
@@ -164,8 +158,6 @@ main = do
         glClearColor 0.2 0.3 0.3 1.0
         glClear GL_COLOR_BUFFER_BIT
         glUseProgram shaderProgram
-
-        setMatrix shaderProgram "transform" (rz 0.3)
 
         glUniform1i uniTex0 0
         glUniform1i uniTex1 1
