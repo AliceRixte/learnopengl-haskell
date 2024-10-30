@@ -6,7 +6,6 @@
 module Main (main) where
 
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
@@ -22,9 +21,6 @@ import LearnGL.Window
 import LearnGL.Shader
 
 
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/6-shaders/gl/"
@@ -89,7 +85,7 @@ main = do
 
 
 
-  (vao, vbo) <- initBuffers
+  (vao, _) <- initBuffers
 
 
 

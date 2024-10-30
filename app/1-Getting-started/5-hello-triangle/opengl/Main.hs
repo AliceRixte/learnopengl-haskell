@@ -10,7 +10,6 @@ import qualified Data.ByteString as BS
 import qualified Data.Vector.Storable as V
 import Foreign.Storable (sizeOf)
 import Foreign.Ptr (nullPtr)
-import Foreign.C.Types
 
 import qualified SDL
 import Graphics.Rendering.OpenGL
@@ -48,9 +47,6 @@ vertices = V.fromList [ -0.5, -0.5, 0.0
             ,  0.5, -0.5, 0.0
             ,  0.0,  0.5, 0.0
             ]
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (800,600)
 
 main :: IO ()
 main = do

@@ -19,11 +19,14 @@ core33Config = SDL.OpenGLConfig
   , SDL.glProfile = SDL.Core SDL.Debug 3 3
   }
 
+screenWidth, screenHeight :: CInt
+(screenWidth, screenHeight) = (800, 600)
+
 -- | Create a new SDL/OpenGL window
 openWindow :: CInt -> CInt -> IO (SDL.Window)
-openWindow screenWidth screenHeight = do
-  SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MAJOR_VERSION 3
-  SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MINOR_VERSION 3
+openWindow screenWidth' screenHeight' = do
+  _ <- SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MAJOR_VERSION 3
+  _ <- SDLR.glSetAttribute SDLR.SDL_GL_CONTEXT_MINOR_VERSION 3
   SDL.initialize [SDL.InitVideo]
   SDL.HintRenderScaleQuality $= SDL.ScaleLinear
 
@@ -34,7 +37,7 @@ openWindow screenWidth screenHeight = do
   window <-
     SDL.createWindow
       "SDL / OpenGL Example"
-      SDL.defaultWindow {SDL.windowInitialSize = V2 screenWidth screenHeight,
+      SDL.defaultWindow {SDL.windowInitialSize = V2 screenWidth' screenHeight',
                          SDL.windowGraphicsContext = SDL.OpenGLContext core33Config}
   SDL.showWindow window
   _ <- SDL.glCreateContext window

@@ -9,44 +9,32 @@ module Main (main) where
 
 
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
-import Data.Word
-import System.Exit
-
-import           Data.ByteString        (ByteString)
-import qualified Data.ByteString        as B
 
 import qualified Data.Vector.Storable as V
 
 import Linear
 
 import qualified SDL
-import qualified SDL.Internal.Vect as SDLV
--- import SDL.Raw
+
 import Graphics.GL
 
 import LearnGL.Window
 import LearnGL.Shader
 import LearnGL.Texture
 import LearnGL.Transform
-
-import Pandia.Space.Geometry
-import Pandia.Space.Geometry.Affine3D
+import LearnGL.GameState
+import LearnGL.Camera
 
 import Data.Traversable
-
-import System.Random.Stateful
 
 import Control.Monad.State.Lazy
 
 import Control.Lens hiding (indices)
 
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (800, 600)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/10-camera/gl/"
@@ -167,15 +155,11 @@ initBuffers = do
           nullPtr
         glEnableVertexAttribArray 0
 
-        -- alloca $ \locationPtr -> do
-          -- poke locationPtr (sizeOf (undefined ::Float) * 3)
         glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
           (fromIntegral (sizeOf (undefined :: Float) * 9))
           (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
         glEnableVertexAttribArray 1
 
-        -- alloca $ \locationPtr -> do
-          -- poke locationPtr (sizeOf (undefined ::Float) * 7)
         glVertexAttribPointer 2 3 GL_FLOAT GL_FALSE
           (fromIntegral (sizeOf (undefined :: Float) * 9))
           (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 7))
@@ -185,123 +169,6 @@ initBuffers = do
         glBindVertexArray 0
         return (vao,vbo)
 
-
-data GameState = GameState {
-    _forwardSpeed :: Float
-  , _lateralSpeed :: Float
-  , _yaw :: Float
-  , _pitch :: Float
-  , _fov :: Float
-  , _front :: V3 Float
-  , _position :: V3 Float
-  , _worldUp :: V3 Float
-  , _now :: Float
-  , _deltaTime :: Float
-
-}
-
-$(makeLenses ''GameState)
-
-
-defaultState = GameState
-  { _forwardSpeed = 0
-  , _lateralSpeed = 0
-  , _yaw = 0
-  , _pitch = 0
-  , _fov = pi / 4
-  , _front = V3 0 0 (-1)
-  , _position = V3 0 0 0
-  , _worldUp = V3 0 1 0
-  , _now = 0
-  , _deltaTime = 0.001
-  }
-
-defaultForwardSpeed :: Float
-defaultForwardSpeed = 5
-
-defaultLateralSpeed :: Float
-defaultLateralSpeed = defaultForwardSpeed
-
-defaultYawSpeed :: Float
-defaultYawSpeed = 5
-
-defaultPitchSpeed :: Float
-defaultPitchSpeed = defaultYawSpeed
-
-defaultZoomSpeed :: Float
-defaultZoomSpeed = 2
-
-
-updateWorld :: GLuint -> StateT GameState IO ()
-updateWorld shaderProgram = do
-  fwd <- use forwardSpeed
-  lateral <- use lateralSpeed
-  frt2 <- use front
-  up <- use worldUp
-  yw <- use yaw
-  ptch <- use pitch
-  let frt = normalize (V3 (cos yw * cos ptch) (sin ptch) (sin yw * cos ptch))
-  let rightVec = -(cross frt up)
-  delta <- use deltaTime
-  position += delta * lateral *^ rightVec
-  position += delta * fwd *^ frt
-
-  timef <- use now
-  pos <- use position
-
-
-  fov' <- use fov
-  liftIO $ setMatrix shaderProgram "view" $ Affine3D $ lookAt pos (pos + frt) up
-  liftIO $ setMatrix shaderProgram "projection"  (Affine3D (
-    perspective fov' (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
-
-
-
-
--- processDirectionEvents :: (SDL.Scancode -> Bool) -> StateT GameState IO ()
--- processDirectionEvents kbstate= do
-
---   if kbstate SDL.ScancodeW then
---     forwardSpeed .= defaultForwardSpeed
---   else if kbstate SDL.ScancodeS then
---     forwardSpeed .= -defaultForwardSpeed
---   else
---     forwardSpeed .= 0
-
---   if kbstate SDL.ScancodeA then
---     lateralSpeed .= defaultLateralSpeed
---   else if kbstate SDL.ScancodeD then
---     lateralSpeed .= -defaultLateralSpeed
---   else
---     lateralSpeed .= 0
-
-
-processCameraEvents :: StateT GameState IO ()
-processCameraEvents = do
-  kbstate <- liftIO SDL.getKeyboardState
-  modstate <- liftIO SDL.getModState
-  if kbstate SDL.ScancodeW then
-    forwardSpeed .= defaultForwardSpeed
-  else if kbstate SDL.ScancodeS then
-    forwardSpeed .= -defaultForwardSpeed
-  else
-    forwardSpeed .= 0
-
-  if kbstate SDL.ScancodeA then
-    lateralSpeed .= defaultLateralSpeed
-  else if kbstate SDL.ScancodeD then
-    lateralSpeed .= -defaultLateralSpeed
-  else
-    lateralSpeed .= 0
-
-  delta <- use deltaTime
-
-  if kbstate SDL.ScancodeR then
-    fov += defaultZoomSpeed * delta
-  else if kbstate SDL.ScancodeF then
-    fov -= defaultZoomSpeed * delta
-  else
-    return ()
 
 
 
@@ -332,27 +199,7 @@ mainState = do
           events <- liftIO SDL.pollEvents
           let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
 
-          -- kbstate <- liftIO SDL.getKeyboardState
           processCameraEvents
-          -- if kbstate SDL.ScancodeLCtrl then
-          --   do
-          -- if kbstate SDL.ScancodeW then
-          --   forwardSpeed .= defaultForwardSpeed
-          -- else if kbstate SDL.ScancodeS then
-          --   forwardSpeed .= -defaultForwardSpeed
-          -- else
-          --   forwardSpeed .= 0
-
-          -- if kbstate SDL.ScancodeA then
-          --   lateralSpeed .= defaultLateralSpeed
-          -- else if kbstate SDL.ScancodeD then
-          --   lateralSpeed .= -defaultLateralSpeed
-          -- else
-          --   lateralSpeed .= 0
-          -- else
-          --   oldfov <- use fov
-          --   let fov' = oldpitch + defaultZoomSpeed * delta * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
-          --   return ()
 
           time <- liftIO SDL.ticks
           lastFrame <- use now
@@ -361,26 +208,12 @@ mainState = do
               delta = timef - lastFrame
           deltaTime .= delta
 
-          SDL.P (V2 mousex mousey) <- SDL.getAbsoluteMouseLocation
-
-          yaw += defaultYawSpeed * delta * (2 * fromIntegral mousex / fromIntegral screenWidth - 1)
-
-          oldpitch <- use pitch
-          let ptch = oldpitch + defaultPitchSpeed * delta * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
-          let newPitch
-                | ptch >= pi /2 - 0.01  =  pi/2 - 0.01
-                | ptch <= - (pi/2) + 0.01 = -(pi/2) +0.01
-                | otherwise             = ptch
-
-          pitch .= newPitch
-
-
           now .= timef
           glClearColor 0.2 0.3 0.3 1.0
+
           glClear GL_COLOR_BUFFER_BIT
           glClear GL_DEPTH_BUFFER_BIT
           glUseProgram shaderProgram
-
 
           glUniform1i uniTex0 0
           glUniform1i uniTex1 1
@@ -389,13 +222,12 @@ mainState = do
 
           glBindVertexArray vao
 
-
           updateWorld shaderProgram
 
             -- let gen = random (mkStdGen 2021)
           _ <- for cubePositions (\pos -> do
 
-            liftIO $ setMatrix shaderProgram "model" $ Affine3D $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
+            liftIO $ setMatrix shaderProgram "model" $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
 
             glDrawElements GL_TRIANGLES  36 GL_UNSIGNED_INT nullPtr
             )

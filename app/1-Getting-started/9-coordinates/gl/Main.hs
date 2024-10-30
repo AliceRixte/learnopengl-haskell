@@ -5,19 +5,11 @@
 
 module Main (main) where
 
-
-
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
-import Data.Word
-import System.Exit
-
-import           Data.ByteString        (ByteString)
-import qualified Data.ByteString        as B
 
 import qualified Data.Vector.Storable as V
 
@@ -31,15 +23,7 @@ import LearnGL.Shader
 import LearnGL.Texture
 import LearnGL.Transform
 
-import Pandia.Space.Geometry
-import Pandia.Space.Geometry.Affine3D
-
 import Data.Traversable
-
-import System.Random.Stateful
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (800, 600)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/9-coordinates/gl/"
@@ -217,9 +201,9 @@ main = do
         glClear GL_DEPTH_BUFFER_BIT
         glUseProgram shaderProgram
 
-        setMatrix shaderProgram "view"  (mx (0) <> mz (-3) <> rz (fromIntegral time / (5000)))
-        setMatrix shaderProgram "projection"  (Affine3D (
-          perspective 45  (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
+        setMatrix shaderProgram "view"  (mkTransformation (axisAngle (V3 0 0 1) (fromIntegral time / 5000)) (V3 0 0 (-3)))
+        setMatrix shaderProgram "projection"  (
+          perspective 45  (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 )
         glUniform1i uniTex0 0
         glUniform1i uniTex1 1
 
@@ -230,7 +214,7 @@ main = do
         -- let gen = random (mkStdGen 2021)
         for cubePositions (\pos -> do
           -- applyAtomicGen
-          setMatrix shaderProgram "model" $ Affine3D $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
+          setMatrix shaderProgram "model" $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
 
           glDrawElements GL_TRIANGLES  36 GL_UNSIGNED_INT nullPtr
           )

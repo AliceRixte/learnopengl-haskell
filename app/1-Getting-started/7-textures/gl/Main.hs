@@ -8,16 +8,10 @@ module Main (main) where
 
 
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
-import Data.Word
-import System.Exit
-
-import           Data.ByteString        (ByteString)
-import qualified Data.ByteString        as B
 
 import qualified Data.Vector.Storable as V
 
@@ -29,15 +23,6 @@ import LearnGL.Window
 import LearnGL.Shader
 import LearnGL.Texture
 
-import           Codec.Picture
-import qualified Codec.Picture.Types    as CPTI
-import           Codec.Picture.Extra    (flipVertically)
-import           Codec.Picture.Types
-
-type TEXTURE = Ptr GLuint
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/7-textures/gl/"
@@ -147,7 +132,7 @@ main = do
   texture2 <- loadTexture face
 
 
-  (vao, vbo) <- initBuffers
+  (vao, _) <- initBuffers
 
   let loop = do
         events <- SDL.pollEvents

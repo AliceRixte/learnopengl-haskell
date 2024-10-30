@@ -6,7 +6,6 @@
 module Main (main) where
 
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
@@ -22,9 +21,6 @@ import LearnGL.Window
 import LearnGL.Shader
 
 
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/5-hello-triangle/gl/"
@@ -108,7 +104,7 @@ main = do
         putStrLn "ERROR : Shader program linking failed."
         putStrLn =<< peekCString infolog
 
-  (vao, vbo) <- initBuffers
+  (vao, _) <- initBuffers
   glPolygonMode GL_FRONT_AND_BACK GL_LINE
   let loop = do
         events <- SDL.pollEvents

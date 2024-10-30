@@ -3,9 +3,7 @@ module LearnGL.Shader
   ( module LearnGL.Shader
   ) where
 
-import Data.List
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
@@ -15,7 +13,7 @@ import GHC.Word
 
 import System.Exit
 
-import qualified SDL
+
 import Graphics.GL
 
 compileShader :: GLenum -> FilePath -> IO Word32

@@ -8,16 +8,11 @@ module Main (main) where
 
 
 import Control.Monad
-import Foreign.C.Types
 import Foreign.C.String
 import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
-import Data.Word
-import System.Exit
 
-import           Data.ByteString        (ByteString)
-import qualified Data.ByteString        as B
 
 import qualified Data.Vector.Storable as V
 
@@ -30,13 +25,6 @@ import LearnGL.Window
 import LearnGL.Shader
 import LearnGL.Texture
 import LearnGL.Transform
-
-import Pandia.Space.Geometry
-import Pandia.Space.Geometry.Affine3D
-
-
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
 
 thisDir :: FilePath
 thisDir = "app/1-Getting-started/8-transformations/gl/"
@@ -161,11 +149,11 @@ main = do
 
         time <- SDL.ticks
 
-        glClearColor 0.2 0.3 0.3 1.0
+        glClearColor 0.2 0.3 0.3 1
         glClear GL_COLOR_BUFFER_BIT
         glUseProgram shaderProgram
 
-        setMatrix shaderProgram "transform" (rz 0.3)
+        setMatrix shaderProgram "transform" (mkTransformation (axisAngle (V3 0 0 1) (pi/3)) (V3 0 0 0))
 
         glUniform1i uniTex0 0
         glUniform1i uniTex1 1

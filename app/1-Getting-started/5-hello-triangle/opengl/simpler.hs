@@ -20,9 +20,6 @@ import Graphics.Rendering.OpenGL
 
 import LearnGL.Window
 
-screenWidth, screenHeight :: CInt
-(screenWidth, screenHeight) = (640, 480)
-
 vertices :: V.Vector Float
 vertices = V.fromList [ -0.5,  0.5, 0.0
                       ,  0.5, -0.5, 0.0

@@ -7,7 +7,7 @@ import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
 import Data.Word
-import           Data.List              (intercalate, isSuffixOf)
+import           Data.List              (isSuffixOf)
 
 import qualified Data.Vector.Storable as V
 
