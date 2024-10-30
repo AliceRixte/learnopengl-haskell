@@ -25,6 +25,8 @@ import qualified Data.Vector.Storable as V
 import Linear
 
 import qualified SDL
+import qualified SDL.Internal.Vect as SDLV
+-- import SDL.Raw
 import Graphics.GL
 
 import LearnGL.Window
@@ -187,10 +189,15 @@ initBuffers = do
 data GameState = GameState {
     _forwardSpeed :: Float
   , _lateralSpeed :: Float
+  , _yaw :: Float
+  , _pitch :: Float
+  , _fov :: Float
   , _front :: V3 Float
   , _position :: V3 Float
   , _worldUp :: V3 Float
   , _now :: Float
+  , _deltaTime :: Float
+
 }
 
 $(makeLenses ''GameState)
@@ -199,36 +206,104 @@ $(makeLenses ''GameState)
 defaultState = GameState
   { _forwardSpeed = 0
   , _lateralSpeed = 0
+  , _yaw = 0
+  , _pitch = 0
+  , _fov = pi / 4
   , _front = V3 0 0 (-1)
   , _position = V3 0 0 0
   , _worldUp = V3 0 1 0
   , _now = 0
+  , _deltaTime = 0.001
   }
 
 defaultForwardSpeed :: Float
-defaultForwardSpeed = 0.002
+defaultForwardSpeed = 5
 
 defaultLateralSpeed :: Float
 defaultLateralSpeed = defaultForwardSpeed
+
+defaultYawSpeed :: Float
+defaultYawSpeed = 5
+
+defaultPitchSpeed :: Float
+defaultPitchSpeed = defaultYawSpeed
+
+defaultZoomSpeed :: Float
+defaultZoomSpeed = 2
+
 
 updateWorld :: GLuint -> StateT GameState IO ()
 updateWorld shaderProgram = do
   fwd <- use forwardSpeed
   lateral <- use lateralSpeed
-  frt <- use front
+  frt2 <- use front
   up <- use worldUp
+  yw <- use yaw
+  ptch <- use pitch
+  let frt = normalize (V3 (cos yw * cos ptch) (sin ptch) (sin yw * cos ptch))
   let rightVec = -(cross frt up)
-  position += lateral *^ rightVec
-  position += fwd *^ frt
+  delta <- use deltaTime
+  position += delta * lateral *^ rightVec
+  position += delta * fwd *^ frt
 
   timef <- use now
   pos <- use position
 
 
-
+  fov' <- use fov
   liftIO $ setMatrix shaderProgram "view" $ Affine3D $ lookAt pos (pos + frt) up
   liftIO $ setMatrix shaderProgram "projection"  (Affine3D (
-    perspective 45  (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
+    perspective fov' (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
+
+
+
+
+-- processDirectionEvents :: (SDL.Scancode -> Bool) -> StateT GameState IO ()
+-- processDirectionEvents kbstate= do
+
+--   if kbstate SDL.ScancodeW then
+--     forwardSpeed .= defaultForwardSpeed
+--   else if kbstate SDL.ScancodeS then
+--     forwardSpeed .= -defaultForwardSpeed
+--   else
+--     forwardSpeed .= 0
+
+--   if kbstate SDL.ScancodeA then
+--     lateralSpeed .= defaultLateralSpeed
+--   else if kbstate SDL.ScancodeD then
+--     lateralSpeed .= -defaultLateralSpeed
+--   else
+--     lateralSpeed .= 0
+
+
+processCameraEvents :: StateT GameState IO ()
+processCameraEvents = do
+  kbstate <- liftIO SDL.getKeyboardState
+  modstate <- liftIO SDL.getModState
+  if kbstate SDL.ScancodeW then
+    forwardSpeed .= defaultForwardSpeed
+  else if kbstate SDL.ScancodeS then
+    forwardSpeed .= -defaultForwardSpeed
+  else
+    forwardSpeed .= 0
+
+  if kbstate SDL.ScancodeA then
+    lateralSpeed .= defaultLateralSpeed
+  else if kbstate SDL.ScancodeD then
+    lateralSpeed .= -defaultLateralSpeed
+  else
+    lateralSpeed .= 0
+
+  delta <- use deltaTime
+
+  if kbstate SDL.ScancodeR then
+    fov += defaultZoomSpeed * delta
+  else if kbstate SDL.ScancodeF then
+    fov -= defaultZoomSpeed * delta
+  else
+    return ()
+
+
 
 mainState :: StateT GameState IO ()
 mainState = do
@@ -252,31 +327,54 @@ mainState = do
 
   glEnable GL_DEPTH_TEST
 
+
   let loop :: StateT GameState IO () = do
           events <- liftIO SDL.pollEvents
           let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
 
-          kbstate <- liftIO SDL.getKeyboardState
+          -- kbstate <- liftIO SDL.getKeyboardState
+          processCameraEvents
+          -- if kbstate SDL.ScancodeLCtrl then
+          --   do
+          -- if kbstate SDL.ScancodeW then
+          --   forwardSpeed .= defaultForwardSpeed
+          -- else if kbstate SDL.ScancodeS then
+          --   forwardSpeed .= -defaultForwardSpeed
+          -- else
+          --   forwardSpeed .= 0
 
-          if kbstate SDL.ScancodeW then
-            forwardSpeed .= defaultForwardSpeed
-          else if kbstate SDL.ScancodeS then
-            forwardSpeed .= -defaultForwardSpeed
-          else
-            forwardSpeed .= 0
-
-          if kbstate SDL.ScancodeA then
-            lateralSpeed .= defaultLateralSpeed
-          else if kbstate SDL.ScancodeD then
-            lateralSpeed .= -defaultLateralSpeed
-          else
-            lateralSpeed .= 0
-
-
-
+          -- if kbstate SDL.ScancodeA then
+          --   lateralSpeed .= defaultLateralSpeed
+          -- else if kbstate SDL.ScancodeD then
+          --   lateralSpeed .= -defaultLateralSpeed
+          -- else
+          --   lateralSpeed .= 0
+          -- else
+          --   oldfov <- use fov
+          --   let fov' = oldpitch + defaultZoomSpeed * delta * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
+          --   return ()
 
           time <- liftIO SDL.ticks
+          lastFrame <- use now
+
           let timef = (fromIntegral time :: Float) / 1000
+              delta = timef - lastFrame
+          deltaTime .= delta
+
+          SDL.P (V2 mousex mousey) <- SDL.getAbsoluteMouseLocation
+
+          yaw += defaultYawSpeed * delta * (2 * fromIntegral mousex / fromIntegral screenWidth - 1)
+
+          oldpitch <- use pitch
+          let ptch = oldpitch + defaultPitchSpeed * delta * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
+          let newPitch
+                | ptch >= pi /2 - 0.01  =  pi/2 - 0.01
+                | ptch <= - (pi/2) + 0.01 = -(pi/2) +0.01
+                | otherwise             = ptch
+
+          pitch .= newPitch
+
+
           now .= timef
           glClearColor 0.2 0.3 0.3 1.0
           glClear GL_COLOR_BUFFER_BIT
