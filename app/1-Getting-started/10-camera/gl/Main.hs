@@ -2,6 +2,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE BlockArguments    #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Main (main) where
 
@@ -37,6 +38,10 @@ import Pandia.Space.Geometry.Affine3D
 import Data.Traversable
 
 import System.Random.Stateful
+
+import Control.Monad.State.Lazy
+
+import Control.Lens hiding (indices)
 
 screenWidth, screenHeight :: CInt
 (screenWidth, screenHeight) = (800, 600)
@@ -179,66 +184,133 @@ initBuffers = do
         return (vao,vbo)
 
 
+data GameState = GameState {
+    _forwardSpeed :: Float
+  , _lateralSpeed :: Float
+  , _front :: V3 Float
+  , _position :: V3 Float
+  , _worldUp :: V3 Float
+  , _now :: Float
+}
 
-main :: IO ()
-main = do
-  window <- openWindow screenWidth screenHeight
-  -- glViewport 0 0 (fromIntegral screenWidth) (fromIntegral screenHeight)
+$(makeLenses ''GameState)
 
-  shaderProgram <- makeShaderProgram vertexPath fragmentPath
 
-  ourColorStr <- newCString "ourColor"
+defaultState = GameState
+  { _forwardSpeed = 0
+  , _lateralSpeed = 0
+  , _front = V3 0 0 (-1)
+  , _position = V3 0 0 0
+  , _worldUp = V3 0 1 0
+  , _now = 0
+  }
+
+defaultForwardSpeed :: Float
+defaultForwardSpeed = 0.002
+
+defaultLateralSpeed :: Float
+defaultLateralSpeed = defaultForwardSpeed
+
+updateWorld :: GLuint -> StateT GameState IO ()
+updateWorld shaderProgram = do
+  fwd <- use forwardSpeed
+  lateral <- use lateralSpeed
+  frt <- use front
+  up <- use worldUp
+  let rightVec = -(cross frt up)
+  position += lateral *^ rightVec
+  position += fwd *^ frt
+
+  timef <- use now
+  pos <- use position
+
+
+
+  liftIO $ setMatrix shaderProgram "view" $ Affine3D $ lookAt pos (pos + frt) up
+  liftIO $ setMatrix shaderProgram "projection"  (Affine3D (
+    perspective 45  (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
+
+mainState :: StateT GameState IO ()
+mainState = do
+
+  window <- liftIO $ openWindow screenWidth screenHeight
+
+  shaderProgram <- liftIO $ makeShaderProgram vertexPath fragmentPath
+
+  ourColorStr <- liftIO $ newCString "ourColor"
   ourColor <- glGetUniformLocation shaderProgram ourColorStr
 
   glActiveTexture GL_TEXTURE0
-  _ <- loadTexture wall
-  uniTex0 <- glGetUniformLocation shaderProgram =<< newCString "texture0"
-
-  -- texture1 <- loadTexture wall
-
+  _ <- liftIO $ loadTexture wall
+  uniTex0 <- liftIO $ glGetUniformLocation shaderProgram =<< newCString "texture0"
 
   glActiveTexture GL_TEXTURE1
-  _ <- loadTexture face
-  uniTex1 <- glGetUniformLocation shaderProgram =<< newCString "texture1"
+  _ <- liftIO $ loadTexture face
+  uniTex1 <- liftIO $ glGetUniformLocation shaderProgram =<< newCString "texture1"
 
-  (vao, _) <- initBuffers
-
+  (vao, _) <- liftIO initBuffers
 
   glEnable GL_DEPTH_TEST
 
-  let loop = do
-        events <- SDL.pollEvents
-        let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
+  let loop :: StateT GameState IO () = do
+          events <- liftIO SDL.pollEvents
+          let quit = elem SDL.QuitEvent $ map SDL.eventPayload events
 
-        time <- SDL.ticks
+          kbstate <- liftIO SDL.getKeyboardState
 
-        glClearColor 0.2 0.3 0.3 1.0
-        glClear GL_COLOR_BUFFER_BIT
-        glClear GL_DEPTH_BUFFER_BIT
-        glUseProgram shaderProgram
+          if kbstate SDL.ScancodeW then
+            forwardSpeed .= defaultForwardSpeed
+          else if kbstate SDL.ScancodeS then
+            forwardSpeed .= -defaultForwardSpeed
+          else
+            forwardSpeed .= 0
 
-        setMatrix shaderProgram "view"  (mx (0) <> mz (-3) <> rz (fromIntegral time / (5000)))
-        setMatrix shaderProgram "projection"  (Affine3D (
-          perspective 45  (fromIntegral screenWidth / fromIntegral screenHeight) 0.1 100 ))
-        glUniform1i uniTex0 0
-        glUniform1i uniTex1 1
+          if kbstate SDL.ScancodeA then
+            lateralSpeed .= defaultLateralSpeed
+          else if kbstate SDL.ScancodeD then
+            lateralSpeed .= -defaultLateralSpeed
+          else
+            lateralSpeed .= 0
 
-        glUniform4f ourColor ((sin (fromIntegral time/ 3000) + 1)/ 2) 0 0 1
 
-        glBindVertexArray vao
 
-        -- let gen = random (mkStdGen 2021)
-        for cubePositions (\pos -> do
-          -- applyAtomicGen
-          setMatrix shaderProgram "model" $ Affine3D $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
 
-          glDrawElements GL_TRIANGLES  36 GL_UNSIGNED_INT nullPtr
-          )
-        SDL.glSwapWindow window
+          time <- liftIO SDL.ticks
+          let timef = (fromIntegral time :: Float) / 1000
+          now .= timef
+          glClearColor 0.2 0.3 0.3 1.0
+          glClear GL_COLOR_BUFFER_BIT
+          glClear GL_DEPTH_BUFFER_BIT
+          glUseProgram shaderProgram
 
-        unless quit loop
+
+          glUniform1i uniTex0 0
+          glUniform1i uniTex1 1
+
+          glUniform4f ourColor ((sin (fromIntegral time/ 3000) + 1)/ 2) 0 0 1
+
+          glBindVertexArray vao
+
+
+          updateWorld shaderProgram
+
+            -- let gen = random (mkStdGen 2021)
+          _ <- for cubePositions (\pos -> do
+
+            liftIO $ setMatrix shaderProgram "model" $ Affine3D $ mkTransformation(axisAngle pos (pi*(fromIntegral time)/2000)) pos
+
+            glDrawElements GL_TRIANGLES  36 GL_UNSIGNED_INT nullPtr
+            )
+          liftIO $ SDL.glSwapWindow window
+
+          unless quit loop
 
   loop
+  liftIO $ closeWindow window
 
-  closeWindow window
+
+main :: IO ()
+main = evalStateT mainState defaultState
+
+
 
