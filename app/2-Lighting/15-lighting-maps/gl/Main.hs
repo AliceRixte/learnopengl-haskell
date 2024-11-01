@@ -45,11 +45,13 @@ shaderPath = thisDir ++ "shaders/"
 textures :: FilePath
 textures = "textures/"
 
-wall :: FilePath
-wall = textures ++ "wall.jpg"
+containerDiffuse :: FilePath
+containerDiffuse = textures ++ "container2.png"
+containerSpecular :: FilePath
+containerSpecular = textures ++ "container2_specular.png"
+containerEmission :: FilePath
+containerEmission = textures ++ "matrix.jpg"
 
-face :: FilePath
-face = textures ++ "awesomeface.png"
 
 vertexPath :: FilePath
 vertexPath = shaderPath ++ "vertex.glsl"
@@ -60,48 +62,49 @@ fragmentPath = shaderPath ++ "fragment.glsl"
 
 vertices :: V.Vector GLfloat
 vertices = V.fromList
- [  -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
-     0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
-     0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
-    -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
-    -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+      [
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
+        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  1.0,
+        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
 
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-     0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-    -0.5,  0.5,  0.5,  0.0,  0.0, 1.0,
-    -0.5, -0.5,  0.5,  0.0,  0.0, 1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
+         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
+        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
+        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
 
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
-    -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
-    -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
-    -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
+        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0,  1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
+        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0,  0.0,
+        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
 
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
-     0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
-     0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
-     0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
+         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0,  1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
+         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0,  0.0,
+         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
 
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-     0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-    -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
-    -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
+         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0,  1.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
+        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
+        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
 
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-     0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-    -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
-    -0.5,  0.5, -0.5,  0.0,  1.0,  0.0
-  ]
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0,
+         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0,  1.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
+        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0,  0.0,
+        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0
+      ]
 
 indices :: V.Vector GLuint
 indices = V.fromList
@@ -154,19 +157,19 @@ makeVao vao vbo ebo = do
   glBindBuffer GL_ELEMENT_ARRAY_BUFFER ebo
 
   glVertexAttribPointer 0 3 GL_FLOAT GL_FALSE
-    (fromIntegral (sizeOf (undefined :: Float) * 6))
+    (fromIntegral (sizeOf (undefined :: Float) * 8))
     nullPtr
   glEnableVertexAttribArray 0
 
   glVertexAttribPointer 1 3 GL_FLOAT GL_FALSE
-    (fromIntegral (sizeOf (undefined :: Float) * 6))
+    (fromIntegral (sizeOf (undefined :: Float) * 8))
     (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 3))
   glEnableVertexAttribArray 1
 
-  -- glVertexAttribPointer 2 3 GL_FLOAT GL_FALSE
-  --   (fromIntegral (sizeOf (undefined :: Float) * 9))
-  --   (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 7))
-  -- glEnableVertexAttribArray 2
+  glVertexAttribPointer 2 3 GL_FLOAT GL_FALSE
+    (fromIntegral (sizeOf (undefined :: Float) * 8))
+    (nullPtr `plusPtr` (sizeOf (undefined ::Float) * 6))
+  glEnableVertexAttribArray 2
 
   glBindBuffer GL_ARRAY_BUFFER 0
   glBindVertexArray 0
@@ -184,13 +187,9 @@ mainState = do
   viewPos <- liftIO $ glGetUniformLocation shaderCube  =<< newCString "viewPos"
 
   glActiveTexture GL_TEXTURE0
-  _ <- liftIO $ loadTexture wall
-  uniTex0 <- liftIO $ glGetUniformLocation shaderCube =<< newCString "texture0"
-
-  glActiveTexture GL_TEXTURE1
-  _ <- liftIO $ loadTexture face
-  uniTex1 <- liftIO $ glGetUniformLocation shaderCube =<< newCString "texture1"
-
+  diffuseMap <- liftIO $ loadTexture containerDiffuse
+  specularMap <- liftIO $ loadTexture containerSpecular
+  emissionMap <- liftIO $ loadTexture containerEmission
 
   lightVao <- liftIO $ alloca $ \vaoPtr -> do
     glGenVertexArrays 1 vaoPtr
@@ -227,10 +226,19 @@ mainState = do
           glClear GL_DEPTH_BUFFER_BIT
           glUseProgram shaderCube
 
-          glUniform1i uniTex0 0
-          glUniform1i uniTex1 1
+          setUniformi shaderCube "material.diffuse" 0
+          setUniformi shaderCube "material.specular" 1
+          setUniformi shaderCube "material.emission" 2
 
-          -- V3 viewx viewy viewz <- use position
+          glActiveTexture GL_TEXTURE0
+          glBindTexture GL_TEXTURE_2D diffuseMap
+
+          glActiveTexture GL_TEXTURE1
+          glBindTexture GL_TEXTURE_2D specularMap
+
+          glActiveTexture GL_TEXTURE2
+          glBindTexture GL_TEXTURE_2D emissionMap
+
           setUniform3f shaderCube "viewPos" =<< use position
 
           glBindVertexArray vao
