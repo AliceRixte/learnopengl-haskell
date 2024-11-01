@@ -37,7 +37,7 @@ import Control.Lens hiding (indices)
 
 
 thisDir :: FilePath
-thisDir = "app/2-Lighting/13-basic-lighting/gl/"
+thisDir = "app/2-Lighting/14-materials/"
 
 shaderPath :: FilePath
 shaderPath = thisDir ++ "shaders/"
@@ -172,6 +172,7 @@ makeVao vao vbo ebo = do
   glBindVertexArray 0
 
 
+
 mainState :: StateT GameState IO ()
 mainState = do
 
@@ -180,9 +181,6 @@ mainState = do
   shaderCube <- liftIO $ makeShaderProgram vertexPath fragmentPath
   shaderSource <- liftIO $ makeShaderProgram (shaderPath ++ "light_cube_vs.glsl") (shaderPath ++ "light_cube_fs.glsl")
 
-  objectColor <- liftIO $ glGetUniformLocation shaderCube =<< newCString "objectColor"
-  lightColor <- liftIO $ glGetUniformLocation shaderCube  =<< newCString "lightColor"
-  lightPos <- liftIO $ glGetUniformLocation shaderCube  =<< newCString "lightPos"
   viewPos <- liftIO $ glGetUniformLocation shaderCube  =<< newCString "viewPos"
 
   glActiveTexture GL_TEXTURE0
@@ -232,17 +230,23 @@ mainState = do
           glUniform1i uniTex0 0
           glUniform1i uniTex1 1
 
-          glUniform3f objectColor 1 0 0
-          glUniform3f lightColor 1 1 1
-
-          let lightPosX = 3 * cos timef
-              lightPosY = 3
-              lightPosZ = 3 * sin timef
-          glUniform3f lightPos lightPosX lightPosY lightPosZ
-          V3 viewx viewy viewz <- use position
-          glUniform3f viewPos viewx viewy viewz
+          -- V3 viewx viewy viewz <- use position
+          setUniform3f shaderCube "viewPos" =<< use position
 
           glBindVertexArray vao
+
+          setUniform3f shaderCube "material.ambient" (V3 1 0.5 0.31)
+          setUniform3f shaderCube "material.diffuse" (V3 1 0.5 0.31)
+          setUniform3f shaderCube "material.specular" (V3 0.5 0.5 0.5)
+          setUniformf  shaderCube "material.shininess" 32
+
+          let lightPos = V3 (5 * cos timef) 3 (5 * sin timef)
+
+          setUniform3f shaderCube "light.ambient" (V3 0.2 0.2 0.2)
+          setUniform3f shaderCube "light.diffuse" (V3 0.5 0.5 0.5)
+          setUniform3f shaderCube "light.specular" (V3 1.0 1.0 1.0)
+          setUniform3f  shaderCube "light.position" lightPos
+
 
           updateWorld shaderCube
 
@@ -254,7 +258,7 @@ mainState = do
           glUseProgram shaderSource
           glBindVertexArray lightVao
 
-          liftIO $ setMatrix shaderSource "model" (mkTransformation (axisAngle (V3 0 0 0) 0) (V3 lightPosX lightPosY lightPosZ))
+          liftIO $ setMatrix shaderSource "model" (mkTransformation (axisAngle (V3 0 0 0) 0) lightPos)
 
           updateWorld shaderSource
 

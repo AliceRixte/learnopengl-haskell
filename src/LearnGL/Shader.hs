@@ -9,12 +9,45 @@ import Foreign.Ptr
 import Foreign.Storable
 import Foreign.Marshal.Alloc
 
+
 import GHC.Word
 
 import System.Exit
 
+import Control.Monad.IO.Class
 
+import Linear
 import Graphics.GL
+
+setUniformBool :: MonadIO m => GLuint -> String -> Bool -> m ()
+setUniformBool shader name True = do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform1i uni 1
+setUniformBool shader name False = do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform1i uni 0
+
+setUniformi :: (MonadIO m, Integral n) => GLuint -> String -> n -> m ()
+setUniformi shader name n = do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform1i uni (fromIntegral n)
+
+setUniformf :: (MonadIO m) => GLuint -> String -> Float -> m ()
+setUniformf shader name f = do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform1f uni (realToFrac f)
+
+setUniform3f :: (MonadIO m)=> GLuint -> String -> V3 Float -> m ()
+setUniform3f shader name (V3 x y z)= do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform3f uni (realToFrac x) (realToFrac y) (realToFrac z)
+
+setUniform4f :: (MonadIO m) => GLuint -> String -> V4 Float -> m ()
+setUniform4f shader name (V4 x y z w)= do
+  uni <- liftIO $ glGetUniformLocation shader =<< newCString name
+  glUniform4f uni (realToFrac x) (realToFrac y) (realToFrac z) (realToFrac w)
+
+
 
 compileShader :: GLenum -> FilePath -> IO Word32
 compileShader shaderType shaderSource = do

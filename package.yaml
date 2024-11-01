@@ -185,6 +185,15 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
+  materials:
+    main:                 Main.hs
+    source-dirs:          app/2-lighting/14-materials/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
 
 
 tests:
