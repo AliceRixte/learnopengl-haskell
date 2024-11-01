@@ -51,16 +51,16 @@ processCameraEvents = do
   -- Mouse movement
 
   SDL.P (V2 mousex mousey) <- SDL.getAbsoluteMouseLocation
-  yaw .= pi  * (1 - 2 * fromIntegral mousex / fromIntegral screenWidth)
+  yaw .= pi  * (2 * fromIntegral mousex / fromIntegral screenWidth - 1)
 
   oldpitch <- use pitch
-  let ptch = oldpitch + defaultPitchSpeed * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
+  let ptch = oldpitch + defaultPitchSpeed * (2 * fromIntegral mousey / fromIntegral screenHeight - 1)
   let newPitch
         | ptch >= pi /2 - 0.01  =  pi/2 - 0.01
         | ptch <= - (pi/2) + 0.01 = -(pi/2) +0.01
         | otherwise             = ptch
 
-  pitch .= pi / 2 * (2 * fromIntegral mousey / fromIntegral screenHeight - 1)
+  pitch .= pi / 2 * (1 - 2 * fromIntegral mousey / fromIntegral screenHeight)
 
 
 
