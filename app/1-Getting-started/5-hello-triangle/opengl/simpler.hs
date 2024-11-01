@@ -8,13 +8,11 @@ import System.Exit
 import Foreign.Marshal.Array
 import Foreign.Ptr
 import Foreign.Storable
-import Foreign.C.Types
 
 import qualified Data.ByteString as BS
 import qualified Data.Vector.Storable as V
 import           System.IO
 
-import SDL (($=))
 import qualified SDL
 import Graphics.Rendering.OpenGL
 
