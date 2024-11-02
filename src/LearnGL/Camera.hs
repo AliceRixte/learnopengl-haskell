@@ -72,6 +72,7 @@ updateWorld shaderProgram = do
   yw <- use yaw
   ptch <- use pitch
   let frt = normalize (V3 (cos yw * cos ptch) (sin ptch) (sin yw * cos ptch))
+  front .= frt
   let rightVec = -(cross frt up)
   delta <- use deltaTime
   position += delta * lateral *^ rightVec

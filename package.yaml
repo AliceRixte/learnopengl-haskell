@@ -203,6 +203,15 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
+  light-casters:
+    main:                 Main.hs
+    source-dirs:          app/2-lighting/16-light-casters/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
 
 
 tests:
