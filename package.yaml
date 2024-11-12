@@ -221,6 +221,16 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - learnopengl-haskell
+    - learnopengl-haskell
+  model:
+    main:                 Main.hs
+    source-dirs:          app/3-model-loading/20-model/gl
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - learnopengl-haskell
 
 
 tests:

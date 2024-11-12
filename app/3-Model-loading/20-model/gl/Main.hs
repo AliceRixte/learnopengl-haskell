@@ -27,6 +27,7 @@ import LearnGL.Texture
 import LearnGL.Transform
 import LearnGL.GameState
 import LearnGL.Camera
+import LearnGL.Mesh
 
 import Data.Foldable
 import Data.Traversable
@@ -37,7 +38,7 @@ import Control.Lens hiding (indices)
 
 
 thisDir :: FilePath
-thisDir = "app/2-Lighting/17-multiple-lights/"
+thisDir = "app/3-Model-loading/20-model/"
 
 shaderPath :: FilePath
 shaderPath = thisDir ++ "shaders/"
@@ -58,56 +59,58 @@ fragmentPath = shaderPath ++ "fragment.glsl"
 
 
 
-vertices :: V.Vector GLfloat
-vertices = V.fromList
+cubeVertices :: [Vertex Float]
+cubeVertices =
       [
-        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
-         0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  0.0,
-         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
-         0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  1.0,  1.0,
-        -0.5,  0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  1.0,
-        -0.5, -0.5, -0.5,  0.0,  0.0, -1.0,  0.0,  0.0,
+      Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 0.0  0.0)
+    , Vertex (V3 ( 0.5) (-0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 1.0  1.0)
+    , Vertex (V3 ( 0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 1.0  1.0)
+    , Vertex (V3 (-0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 0.0  1.0)
+    , Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 ( 0.0) ( 0.0) (-1.0)) (V2 0.0  0.0)
+    , Vertex (V3 (-0.5) (-0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 0.0  0.0)
+    , Vertex (V3 ( 0.5) (-0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 1.0  1.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 1.0  1.0)
+    , Vertex (V3 (-0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 0.0  1.0)
+    , Vertex (V3 (-0.5) (-0.5) ( 0.5)) (V3 ( 0.0) ( 0.0) ( 1.0)) (V2 0.0  0.0)
+    , Vertex (V3 (-0.5) ( 0.5) ( 0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 (-0.5) ( 0.5) (-0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 1.0  1.0)
+    , Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 (-0.5) (-0.5) ( 0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 0.0  0.0)
+    , Vertex (V3 (-0.5) ( 0.5) ( 0.5)) (V3 (-1.0) ( 0.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) (-0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 1.0  1.0)
+    , Vertex (V3 ( 0.5) (-0.5) (-0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 ( 0.5) (-0.5) (-0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 ( 0.5) (-0.5) ( 0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 0.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 1.0) ( 0.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 ( 0.5) (-0.5) (-0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 1.0  1.0)
+    , Vertex (V3 ( 0.5) (-0.5) ( 0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) (-0.5) ( 0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 (-0.5) (-0.5) ( 0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 0.0  0.0)
+    , Vertex (V3 (-0.5) (-0.5) (-0.5)) (V3 ( 0.0) (-1.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 (-0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 0.0  1.0)
+    , Vertex (V3 ( 0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 1.0  1.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 ( 0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 1.0  0.0)
+    , Vertex (V3 (-0.5) ( 0.5) ( 0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 0.0  0.0)
+    , Vertex (V3 (-0.5) ( 0.5) (-0.5)) (V3 ( 0.0) ( 1.0) ( 0.0)) (V2 0.0  1.0)
+    ]
 
-        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
-         0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  0.0,
-         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
-         0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  1.0,  1.0,
-        -0.5,  0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  1.0,
-        -0.5, -0.5,  0.5,  0.0,  0.0,  1.0,  0.0,  0.0,
-
-        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
-        -0.5,  0.5, -0.5, -1.0,  0.0,  0.0,  1.0,  1.0,
-        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
-        -0.5, -0.5, -0.5, -1.0,  0.0,  0.0,  0.0,  1.0,
-        -0.5, -0.5,  0.5, -1.0,  0.0,  0.0,  0.0,  0.0,
-        -0.5,  0.5,  0.5, -1.0,  0.0,  0.0,  1.0,  0.0,
-
-         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
-         0.5,  0.5, -0.5,  1.0,  0.0,  0.0,  1.0,  1.0,
-         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
-         0.5, -0.5, -0.5,  1.0,  0.0,  0.0,  0.0,  1.0,
-         0.5, -0.5,  0.5,  1.0,  0.0,  0.0,  0.0,  0.0,
-         0.5,  0.5,  0.5,  1.0,  0.0,  0.0,  1.0,  0.0,
-
-        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
-         0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  1.0,  1.0,
-         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
-         0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  1.0,  0.0,
-        -0.5, -0.5,  0.5,  0.0, -1.0,  0.0,  0.0,  0.0,
-        -0.5, -0.5, -0.5,  0.0, -1.0,  0.0,  0.0,  1.0,
-
-        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0,
-         0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  1.0,  1.0,
-         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
-         0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  1.0,  0.0,
-        -0.5,  0.5,  0.5,  0.0,  1.0,  0.0,  0.0,  0.0,
-        -0.5,  0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  1.0
-      ]
-
-indices :: V.Vector GLuint
-indices = V.fromList
+cubeIndices :: V.Vector GLuint
+cubeIndices = V.fromList
     [ 0 .. 35
     ]
+
+cubeMesh :: Mesh
+cubeMesh = Mesh
+  { meshVertices = cubeVertices
+  , meshIndices = [0 .. 35]
+  , meshTextures = []
+  }
 
 cubePositions :: [V3 GLfloat]
 cubePositions =
@@ -132,39 +135,13 @@ lightPositions = [
   ]
 
 
-
-proxySizeOf :: forall a p. Storable a => p a -> Int
-proxySizeOf _ = sizeOf (undefined :: a)
-
 -- floatSize = sizeOf (undefined :: Float)
 
-cube :: IO (GLuint, GLuint)
-cube =
-  alloca $ \vboPtr -> do
-    alloca $ \eboPtr -> do
-
-      glGenBuffers 1 vboPtr
-      glGenBuffers 1 eboPtr
-      vbo <- peek vboPtr
-      ebo <- peek eboPtr
-
-      glBindBuffer GL_ARRAY_BUFFER vbo
-      V.unsafeWith vertices $ \verticesPtr -> do
-        glBufferData GL_ARRAY_BUFFER
-                    (fromIntegral (V.length vertices * proxySizeOf vertices))
-                    (castPtr verticesPtr)
-                    GL_STATIC_DRAW
-
-      glBindBuffer GL_ELEMENT_ARRAY_BUFFER ebo
-      V.unsafeWith indices $ \indicesPtr -> do
-        glBufferData GL_ELEMENT_ARRAY_BUFFER
-                    (fromIntegral (V.length indices * proxySizeOf indices))
-                    (castPtr indicesPtr)
-                    GL_STATIC_DRAW
-      glBindBuffer GL_ARRAY_BUFFER 0
-      glBindBuffer GL_ELEMENT_ARRAY_BUFFER 0
-
-      return (vbo, ebo)
+cube :: IO (GLuint, GLuint, GLuint)
+cube = do
+  MeshGL vao vbo ebo <- genMeshGL
+  bindMesh cubeMesh (MeshGL vao vbo ebo)
+  return (vao,vbo, ebo)
 
 
 
@@ -220,11 +197,13 @@ mainState = do
     glGenVertexArrays 1 vaoPtr
     peek vaoPtr
 
-  vao <- liftIO $ alloca $ \vaoPtr -> do
-    glGenVertexArrays 1 vaoPtr
-    peek vaoPtr
+  -- vao <- liftIO $ alloca $ \vaoPtr -> do
+  --   glGenVertexArrays 1 vaoPtr
+  --   peek vaoPtr
 
-  (vbo,ebo) <- liftIO cube
+  MeshGL vao vbo ebo <- liftIO genMeshGL
+  liftIO $ bindMesh cubeMesh (MeshGL vao vbo ebo)
+
 
   liftIO $ makeVao vao vbo ebo
   liftIO $ makeVao lightVao vbo ebo
